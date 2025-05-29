@@ -8,20 +8,15 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-24 px-8">
+      <main className="flex-1 p-0 m-0">
         <Routes>
           <Route
             path="/"
             element={
               <div className="flex items-center justify-between gap-8">
-                <div className="w-1/2">
-                  <h1 className="text-4xl font-bold text-gray-900">
-                    Delivery Services Now Available!
-                  </h1>
-                </div>
-                <div className="w-1/2">
+                <div className="w-full">
                   <img
-                    src="/images/truck.png"
+                    src="/images/Delivery.png"
                     alt="Banner"
                     className="w-full h-auto object-contain"
                   />
