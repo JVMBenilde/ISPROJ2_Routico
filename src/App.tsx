@@ -1,43 +1,39 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
 import './App.css';
 import Navbar from './components/navbar';
 import { Routes, Route } from 'react-router-dom';
 import RegisterPage from './pages/register';
+import Footer from './components/footer';
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/" element={
-          <div>
-            <a href="https://vite.dev" target="_blank">
-              <img src={viteLogo} className="logo" alt="Vite logo" />
-            </a>
-            <a href="https://react.dev" target="_blank">
-              <img src={reactLogo} className="logo react" alt="React logo" />
-            </a>
-            <h1>Vite + React</h1>
-            <div className="card">
-              <button onClick={() => setCount((count) => count + 1)}>
-                count is {count}
-              </button>
-              <p>
-                Edit <code>src/App.tsx</code> and save to test HMR
-              </p>
-            </div>
-            <p className="read-the-docs">
-              Click on the Vite and React logos to learn more
-            </p>
-          </div>
-        } />
-      </Routes>
-    </>
+      <main className="flex-1 pt-24 px-8">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div className="flex items-center justify-between gap-8">
+                <div className="w-1/2">
+                  <h1 className="text-4xl font-bold text-gray-900">
+                    Delivery Services Now Available!
+                  </h1>
+                </div>
+                <div className="w-1/2">
+                  <img
+                    src="/images/truck.png"
+                    alt="Banner"
+                    className="w-full h-auto object-contain"
+                  />
+                </div>
+              </div>
+            }
+          />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 }
 
