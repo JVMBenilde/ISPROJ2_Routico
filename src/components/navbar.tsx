@@ -30,7 +30,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/register"
-              className="bg-white text-white px-5 py-2 rounded-md font-medium  transition-colors"
+              className="bg-white text-black px-5 py-2 rounded-md font-medium  transition-colors"
             >
               Register
             </Link>

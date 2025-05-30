@@ -1,4 +1,4 @@
-// components/RegisterPage.tsx
+
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 
@@ -41,48 +41,100 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="bg-white p-20 rounded-2xl shadow-lg w-full max-w-md text-left border border-black">
-        <h1 className="text-4xl font-extrabold text-center text-black-600">Routico</h1>
+    <main className="min-h-screen flex items-start justify-center bg-white px-4 pt-30 pb-10">
+      <div className="bg-white p-10 md:p-20 rounded-2xl shadow-lg w-full max-w-md text-left border border-gray-300">
+        <h1 className="text-4xl font-extrabold text-center text-black">Routico</h1>
         <h2 className="text-xl font-semibold text-center mt-2 mb-6">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input name="fullName" type="text" value={form.fullName} onChange={handleChange} placeholder="Juan Dela Cruz" className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="fullName"
+              type="text"
+              value={form.fullName}
+              onChange={handleChange}
+              placeholder="Juan Dela Cruz"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="juandelacruz@email.com" className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="juandelacruz@email.com"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="09XXXXXXXXX" className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="phone"
+              type="tel"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="09XXXXXXXXX"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input name="password" type="password" value={form.password} onChange={handleChange} className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="confirmPassword"
+              type="password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
             <div className="flex items-center space-x-4">
               <label className="inline-flex items-center">
-                <input type="radio" name="accountType" value="business_owner" onChange={handleChange} className="form-radio text-blue-600" />
+                <input
+                  type="radio"
+                  name="accountType"
+                  value="business_owner"
+                  onChange={handleChange}
+                  className="form-radio text-blue-600"
+                />
                 <span className="ml-2 text-sm text-gray-700">Business Owner</span>
               </label>
               <label className="inline-flex items-center">
-                <input type="radio" name="accountType" value="driver" onChange={handleChange} className="form-radio text-blue-600" />
+                <input
+                  type="radio"
+                  name="accountType"
+                  value="driver"
+                  onChange={handleChange}
+                  className="form-radio text-blue-600"
+                />
                 <span className="ml-2 text-sm text-gray-700">Driver</span>
               </label>
             </div>
           </div>
-          <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200">Register</button>
+          <button
+            type="submit"
+            className="w-full mt-4 bg-black text-white py-2 rounded-md hover:bg-gray-900 transition duration-200"
+          >
+            Register
+          </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 };
 
