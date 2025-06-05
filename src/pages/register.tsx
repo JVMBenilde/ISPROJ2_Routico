@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import { Link } from 'react-router-dom';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -133,6 +134,12 @@ const RegisterPage = () => {
             Register
           </button>
         </form>
+        <p className="text-sm text-center text-gray-600 mt-4">
+          {' '}
+          <Link to="/login" className="text-sm text-blue-600 text-center mt-4 hover:underline">
+            Already have an account?
+          </Link>
+        </p>
       </div>
     </main>
   );
