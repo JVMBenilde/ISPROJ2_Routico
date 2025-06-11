@@ -28,8 +28,8 @@ const Navbar = () => {
               strokeLinejoin="round"
               d={
                 menuOpen
-                  ? "M6 18L18 6M6 6l12 12" // X icon
-                  : "M4 6h16M4 12h16M4 18h16" // Hamburger
+                  ? "M6 18L18 6M6 6l12 12" 
+                  : "M4 6h16M4 12h16M4 18h16" 
               }
             />
           </svg>

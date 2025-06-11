@@ -1,34 +1,39 @@
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
+import { registerUser } from '../api/register';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
-    accountType: '',
+    role: '',
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { fullName, email, phone, password, confirmPassword, accountType } = form;
+    const { fullName, email, phone, password, confirmPassword, role } = form;
 
-    if (!fullName || !email || !phone || !password || !confirmPassword || !accountType) {
+    if (!fullName || !email || !phone || !password || !confirmPassword || !role) {
       Swal.fire('All fields are required!', '', 'warning');
       return;
     }
 
-    if (!/^\d{11}$/.test(phone)) {
+    if (!/^[0-9]{11}$/.test(phone)) {
       Swal.fire('Phone number must be exactly 11 digits.', '', 'error');
       return;
     }
@@ -38,7 +43,26 @@ const RegisterPage = () => {
       return;
     }
 
-    Swal.fire('Registered Successfully!', '', 'success');
+    setLoading(true);
+
+    try {
+      await registerUser({ fullName, email, phone, password, role });
+      Swal.fire('Registered Successfully! Check your email for OTP.', '', 'success').then(() => {
+        navigate('/verify-otp', { state: { email: form.email } });
+      });
+      setForm({
+        fullName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        role: '',
+      });
+    } catch (error: any) {
+      Swal.fire(error.message || 'Server error. Please try again later.', '', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,6 +80,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               placeholder="Juan Dela Cruz"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -67,6 +92,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               placeholder="juandelacruz@email.com"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -78,6 +104,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               placeholder="09XXXXXXXXX"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -89,6 +116,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               placeholder="••••••••"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -100,6 +128,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               placeholder="••••••••"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -108,20 +137,24 @@ const RegisterPage = () => {
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="accountType"
+                  name="role"
                   value="business_owner"
                   onChange={handleChange}
                   className="form-radio text-blue-600"
+                  checked={form.role === 'business_owner'}
+                  disabled={loading}
                 />
                 <span className="ml-2 text-sm text-gray-700">Business Owner</span>
               </label>
               <label className="inline-flex items-center">
                 <input
                   type="radio"
-                  name="accountType"
+                  name="role"
                   value="driver"
                   onChange={handleChange}
                   className="form-radio text-blue-600"
+                  checked={form.role === 'driver'}
+                  disabled={loading}
                 />
                 <span className="ml-2 text-sm text-gray-700">Driver</span>
               </label>
@@ -129,14 +162,16 @@ const RegisterPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full mt-4 bg-black text-white py-2 rounded-md hover:bg-gray-900 transition duration-200"
+            disabled={loading}
+            className={`w-full mt-4 py-2 rounded-md transition duration-200 ${
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-900'
+            }`}
           >
-            Register
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
         <p className="text-sm text-center text-gray-600 mt-4">
-          {' '}
-          <Link to="/login" className="text-sm text-blue-600 text-center mt-4 hover:underline">
+          <Link to="/login" className="text-sm text-blue-600 hover:underline">
             Already have an account?
           </Link>
         </p>

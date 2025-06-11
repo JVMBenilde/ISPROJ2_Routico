@@ -1,30 +1,61 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const { email, password } = form;
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const { email, password } = form;
 
-    if (!email || !password) {
-      Swal.fire('Email and Password are required!', '', 'warning');
-      return;
+  if (!email || !password) {
+    Swal.fire('Email and Password are required!', '', 'warning');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    console.log('[LOGIN RESPONSE]', data);
+    if (res.ok) {
+      Swal.fire('Login successful!', '', 'success');
+
+      localStorage.setItem('role', data.role);
+
+      if (data.role === 'business_owner') {
+        navigate('/business-owner');
+      } else if (data.role === 'driver') {
+        navigate('/driver');
+      } else {
+        navigate('/');
+      }
+    } else {
+      Swal.fire(data.message || 'Login failed', '', 'error');
     }
-
-    Swal.fire('Login successful!', '', 'success');
+    } catch (err) {
+    Swal.fire('Server error. Please try again later.', '', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <main className="min-h-screen flex items-start justify-center bg-white px-4 pt-30 pb-10">
@@ -41,6 +72,7 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="juandelacruz@email.com"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <div>
@@ -52,13 +84,17 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="••••••••"
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              disabled={loading}
             />
           </div>
           <button
             type="submit"
-            className="w-full mt-4 bg-black text-white py-2 rounded-md hover:bg-gray-900 transition duration-200"
+            className={`w-full mt-4 py-2 rounded-md transition duration-200 ${
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-900'
+            }`}
+            disabled={loading}
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <p className="text-sm text-center text-gray-600 mt-4">

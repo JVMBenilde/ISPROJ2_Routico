@@ -50,7 +50,7 @@ const Footer = () => {
               <address className="not-italic">
                 <p className="mb-2">123 Delivery Lane, Manila</p>
                 <p className="mb-2">Philippines, 1000</p>
-                <p className="mb-2">Email: info@routico.com</p>
+                <p className="mb-2">Email: routicoapp@gmail.com</p>
                 <p>Phone: +63 916 236 9003</p>
               </address>
             </div>
