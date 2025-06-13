@@ -62,7 +62,7 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
           <nav className="space-y-2">
             {role === 'business_owner' ? (
               <>
-                <Link to="/business-owner" className={linkStyle('/business-owner')}>Dashboard</Link>
+                <Link to="/businessdashboard" className={linkStyle('/businessdashboard')}>Dashboard</Link>
                 <Link to="/order-history" className={linkStyle('/order-history')}>Order History</Link>
                 <Link to="/truck-utilization" className={linkStyle('/truck-utilization')}>Truck Utilization</Link>
                 <Link to="/route-optimization" className={linkStyle('/route-optimization')}>Route Optimization</Link>
@@ -71,7 +71,7 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
               </>
             ) : (
               <>
-                <Link to="/driver" className={linkStyle('/driver')}>Driver Dashboard</Link>
+                <Link to="/driverdashboard" className={linkStyle('/driverdashboard')}>Driver Dashboard</Link>
                 <Link to="/assigned-orders" className={linkStyle('/assigned-orders')}>Assigned Orders</Link>
                 <Link to="/delivery-status" className={linkStyle('/delivery-status')}>Delivery Status</Link>
               </>

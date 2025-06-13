@@ -14,7 +14,7 @@ const VerifyOtpPage = () => {
       setEmail(location.state.email);
     } else {
       Swal.fire('Email not found. Please register again.', '', 'error');
-      navigate('/register'); // fallback
+      navigate('/register');
     }
   }, [location.state, navigate]);
 
@@ -34,9 +34,19 @@ const VerifyOtpPage = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        Swal.fire('Email verified successfully!', '', 'success');
-        navigate('/login'); // or wherever
+        Swal.fire('Email verified and account created successfully!', '', 'success');
+        localStorage.setItem('role', data.role);
+        await new Promise(resolve => setTimeout(resolve, 10)); // ✅ tiny delay ensures localStorage is written
+
+        if (data.role === 'business_owner') {
+          navigate('/businessdashboard');
+        } else if (data.role === 'driver') {
+          navigate('/driverdashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         Swal.fire(data.message || 'OTP verification failed.', '', 'error');
       }

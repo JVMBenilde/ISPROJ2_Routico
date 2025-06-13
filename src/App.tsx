@@ -10,22 +10,34 @@ import VerifyOtpPage from './pages/verifyotp';
 import LandingPage from './pages/landingpage';
 import DriverDashboard from './pages/driverdashboard';
 import BusinessOwnerDashboard from './pages/businessdashboard';
+import { useEffect, useState } from 'react';
 
 function App() {
   const location = useLocation();
 
-  const storedRole = localStorage.getItem('role') as 'business_owner' | 'driver' | null;
-  const hideNavbarRoutes = ['/driver', '/business-owner'];
-  const showSidebarRoutes = ['/driver', '/business-owner'];
+  const [storedRole, setStoredRole] = useState<'business_owner' | 'driver' | null>(null);
 
-  const showNavbar = !hideNavbarRoutes.includes(location.pathname);
-  const showSidebar = showSidebarRoutes.includes(location.pathname) && (storedRole === 'driver' || storedRole === 'business_owner');
-  const showFooter = !hideNavbarRoutes.includes(location.pathname);
+  useEffect(() => {
+    const rawRole = localStorage.getItem('role');
+    if (rawRole === 'business_owner' || rawRole === 'driver') {
+      setStoredRole(rawRole);
+    } else {
+      setStoredRole(null);
+    }
+  }, [location.pathname]);
+
+  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard'];
+  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard'];
+
+  const showNavbar = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
+  const showSidebar = showSidebarRoutes.some(route => location.pathname.startsWith(route)) 
+    && storedRole !== null;
+  const showFooter = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
 
   return (
     <div className="min-h-screen flex flex-col">
       {showNavbar && <Navbar />}
-      {showSidebar && storedRole && <Sidebar role={storedRole} />}
+      {showSidebar && storedRole && <Sidebar role={storedRole as 'business_owner' | 'driver'} />}
 
       <main className={`flex-1 p-0 m-0 ${showSidebar ? 'ml-0 md:ml-64' : ''}`}>
         <Routes>
@@ -48,8 +60,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/landing" element={<LandingPage />} />
-          <Route path="/driver" element={<DriverDashboard />} />
-          <Route path="/business-owner" element={<BusinessOwnerDashboard />} />
+          <Route path="/driverdashboard" element={<DriverDashboard />} />
+          <Route path="/businessdashboard" element={<BusinessOwnerDashboard />} />
         </Routes>
       </main>
 

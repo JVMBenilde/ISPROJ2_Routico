@@ -1,179 +1,165 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Link } from 'react-router-dom';
-import { registerUser } from '../api/register';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     phone: '',
+    role: '',
     password: '',
     confirmPassword: '',
-    role: '',
   });
-
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = (): boolean => {
+    const { fullName, email, phone, role, password, confirmPassword } = form;
+
+    if (!fullName || !email || !phone || !role) {
+      Swal.fire('All fields are required!', '', 'warning');
+      return false;
+    }
+
+    if (!/^\d{11}$/.test(phone)) {
+      Swal.fire('Phone number must be exactly 11 digits.', '', 'warning');
+      return false;
+    }
+
+    if (!password || !confirmPassword) {
+      Swal.fire('Password and Confirm Password are required!', '', 'warning');
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      Swal.fire('Passwords do not match!', '', 'warning');
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { fullName, email, phone, password, confirmPassword, role } = form;
+    if (!validateForm()) return;
 
-    if (!fullName || !email || !phone || !password || !confirmPassword || !role) {
-      Swal.fire('All fields are required!', '', 'warning');
+    const { fullName, email, phone, role, password } = form;
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          role,
+          password,
+          googleUser: false,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Swal.fire('OTP sent! Please verify your email.', '', 'success');
+        navigate('/verify-otp', { state: { email } });
+      } else {
+        Swal.fire(data.message || 'Failed to send OTP', '', 'error');
+      }
+    } catch (err: any) {
+      Swal.fire('Server error: ' + err.message, '', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    const { fullName, email, phone, role } = form;
+
+    if (!fullName || !email || !phone || !role) {
+      Swal.fire('Full Name, Email, Phone, and Role are required before signing up with Google!', '', 'warning');
       return;
     }
 
-    if (!/^[0-9]{11}$/.test(phone)) {
-      Swal.fire('Phone number must be exactly 11 digits.', '', 'error');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Swal.fire("Passwords don't match.", '', 'error');
+    if (!/^\d{11}$/.test(phone)) {
+      Swal.fire('Phone number must be exactly 11 digits.', '', 'warning');
       return;
     }
 
     setLoading(true);
 
     try {
-      await registerUser({ fullName, email, phone, password, role });
-      Swal.fire('Registered Successfully! Check your email for OTP.', '', 'success').then(() => {
-        navigate('/verify-otp', { state: { email: form.email } });
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+
+      const res = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          role,
+          password: '',  
+          googleUser: true,
+        }),
       });
-      setForm({
-        fullName: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        role: '',
-      });
-    } catch (error: any) {
-      Swal.fire(error.message || 'Server error. Please try again later.', '', 'error');
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Swal.fire('OTP sent! Please verify your email.', '', 'success');
+        navigate('/verify-otp', { state: { email } });
+      } else {
+        Swal.fire(data.message || 'Failed to send OTP', '', 'error');
+      }
+    } catch (err: any) {
+      Swal.fire('Google signup failed: ' + err.message, '', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen flex items-start justify-center bg-white px-4 pt-30 pb-10">
-      <div className="bg-white p-10 md:p-20 rounded-2xl shadow-lg w-full max-w-md text-left border border-gray-300">
-        <h1 className="text-4xl font-extrabold text-center text-black">Routico</h1>
-        <h2 className="text-xl font-semibold text-center mt-2 mb-6">Register</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              name="fullName"
-              type="text"
-              value={form.fullName}
-              onChange={handleChange}
-              placeholder="Juan Dela Cruz"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="juandelacruz@email.com"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              name="phone"
-              type="tel"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="09XXXXXXXXX"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
-            <div className="flex items-center space-x-4">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="role"
-                  value="business_owner"
-                  onChange={handleChange}
-                  className="form-radio text-blue-600"
-                  checked={form.role === 'business_owner'}
-                  disabled={loading}
-                />
-                <span className="ml-2 text-sm text-gray-700">Business Owner</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="role"
-                  value="driver"
-                  onChange={handleChange}
-                  className="form-radio text-blue-600"
-                  checked={form.role === 'driver'}
-                  disabled={loading}
-                />
-                <span className="ml-2 text-sm text-gray-700">Driver</span>
-              </label>
-            </div>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full mt-4 py-2 rounded-md transition duration-200 ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-900'
-            }`}
-          >
+    <main className="min-h-screen flex items-center justify-center bg-white px-4">
+      <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-md border border-gray-300">
+        <h1 className="text-4xl font-extrabold text-center">Routico</h1>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+          <input name="fullName" type="text" placeholder="Full Name" value={form.fullName} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="phone" type="text" placeholder="Phone (11 digits)" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+
+          <select name="role" value={form.role} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading}>
+            <option value="">Select Role</option>
+            <option value="business_owner">Business Owner</option>
+            <option value="driver">Driver</option>
+          </select>
+
+          <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="confirmPassword" type="password" placeholder="Confirm Password" value={form.confirmPassword} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+
+          <button type="submit" className={`w-full py-3 px-4 border rounded-lg bg-black text-white ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-900'}`}>
             {loading ? 'Registering...' : 'Register'}
           </button>
+
+          <button type="button" onClick={handleGoogleSignup} className="w-full py-3 px-4 border rounded-lg bg-white shadow-sm hover:bg-gray-50">
+            Sign up with Google
+          </button>
         </form>
+
         <p className="text-sm text-center text-gray-600 mt-4">
-          <Link to="/login" className="text-sm text-blue-600 hover:underline">
-            Already have an account?
-          </Link>
+          Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
         </p>
       </div>
     </main>
