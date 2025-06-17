@@ -63,7 +63,9 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
             {role === 'business_owner' ? (
               <>
                 <Link to="/businessdashboard" className={linkStyle('/businessdashboard')}>Dashboard</Link>
+                <Link to="/business-registration" className={linkStyle('/business-registration')}>Business Registration</Link>
                 <Link to="/order-history" className={linkStyle('/order-history')}>Order History</Link>
+                <Link to="/manage-drivers" className={linkStyle('/manage-drivers')}>Manage Drivers</Link>
                 <Link to="/truck-utilization" className={linkStyle('/truck-utilization')}>Truck Utilization</Link>
                 <Link to="/route-optimization" className={linkStyle('/route-optimization')}>Route Optimization</Link>
                 <Link to="/business-overview" className={linkStyle('/business-overview')}>Business Overview</Link>

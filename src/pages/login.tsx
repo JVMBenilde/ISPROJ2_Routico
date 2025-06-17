@@ -53,7 +53,7 @@ const LoginPage = () => {
         Swal.fire(data.message || 'Role fetch failed', '', 'error');
       }
     } catch (err: any) {
-      Swal.fire('Authentication failed', err.message || '', 'error');
+      Swal.fire('Authentication failed', 'Invalid Email or Password.', 'error');
     } finally {
       setLoading(false);
     }
@@ -113,6 +113,10 @@ const LoginPage = () => {
           <button type="submit" className={`w-full py-3 px-4 border border-gray-500 rounded-lg flex items-center justify-center shadow-sm transition-all ${loading ? 'bg-gray-200 cursor-not-allowed' : 'bg-white hover:bg-gray-50'}`} disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
+
+          <p className="text-sm text-center text-gray-600 mt-4">
+          <Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot password</Link>
+        </p>
 
           <button type="button" onClick={handleGoogleLogin} className="w-full py-3 px-4 border border-gray-500 rounded-lg flex items-center justify-center bg-white shadow-sm hover:bg-gray-50 transition-all" disabled={loading}>
             Login with Google

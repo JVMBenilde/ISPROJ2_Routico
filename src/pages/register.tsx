@@ -136,9 +136,9 @@ const RegisterPage = () => {
       <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-md border border-gray-300">
         <h1 className="text-4xl font-extrabold text-center">Routico</h1>
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-          <input name="fullName" type="text" placeholder="Full Name" value={form.fullName} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
-          <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
-          <input name="phone" type="text" placeholder="Phone (11 digits)" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="fullName" type="text" placeholder="Juan Dela Cruz" value={form.fullName} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="email" type="email" placeholder="juandelacruz@email.com" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="phone" type="text" placeholder="09XXXXXXXXX" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
 
           <select name="role" value={form.role} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading}>
             <option value="">Select Role</option>
@@ -146,14 +146,14 @@ const RegisterPage = () => {
             <option value="driver">Driver</option>
           </select>
 
-          <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
-          <input name="confirmPassword" type="password" placeholder="Confirm Password" value={form.confirmPassword} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
+          <input name="confirmPassword" type="password" placeholder="••••••••" value={form.confirmPassword} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} />
 
-          <button type="submit" className={`w-full py-3 px-4 border rounded-lg bg-black text-white ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-900'}`}>
+          <button type="submit" className={`w-full py-3 px-4 border rounded-lg bg-white shadow-sm text-black ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200'}`}>
             {loading ? 'Registering...' : 'Register'}
           </button>
 
-          <button type="button" onClick={handleGoogleSignup} className="w-full py-3 px-4 border rounded-lg bg-white shadow-sm hover:bg-gray-50">
+          <button type="button" onClick={handleGoogleSignup} className="w-full py-3 px-4 border rounded-lg bg-white shadow-sm hover:bg-gray-200">
             Sign up with Google
           </button>
         </form>

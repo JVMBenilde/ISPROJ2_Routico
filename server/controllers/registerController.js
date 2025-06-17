@@ -1,46 +1,60 @@
-// File: controllers/registerController.js
-
 import bcrypt from 'bcrypt';
 import { db } from '../db.js';
 import { sendEmail } from '../utils/mail.js';
 import admin from '../firebaseAdmin.js';
 
-// ✅ Send OTP - Stage 1
 export const sendOtp = async (req, res) => {
-  const { fullName, email, phone, password, role, googleUser } = req.body;
+  const { fullName, email, phone, password, role, googleUser, resend } = req.body;
 
-  // Basic field validations
-  if (!fullName || !email || !phone || !role) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  if (!googleUser && !password) {
-    return res.status(400).json({ message: 'Password is required for normal registration' });
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
   }
 
   try {
-    // Check if user already registered in Users table
-    const [existing] = await db.query('SELECT email FROM Users WHERE email = ?', [email]);
-    if (existing.length > 0) {
-      return res.status(409).json({ message: 'Email already registered' });
+    if (!resend) {
+
+      if (!fullName || !phone || !role) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+
+      const [existing] = await db.query('SELECT email FROM Users WHERE email = ?', [email]);
+      if (existing.length > 0) {
+        return res.status(409).json({ message: 'Email already registered' });
+      }
+
+      const [pending] = await db.query('SELECT email FROM PendingRegistrations WHERE email = ?', [email]);
+      if (pending.length > 0) {
+        return res.status(409).json({ message: 'OTP already sent. Please verify your email.' });
+      }
+
+      const otp = generateOtp();
+      const expiresAt = getExpiry();
+
+      await db.query(
+        `INSERT INTO PendingRegistrations (full_name, email, phone, password, role, otp, otp_expires_at, google_user)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [fullName, email, phone, password || null, role, otp, expiresAt, googleUser || false]
+      );
+
+      await sendEmail(email, otp);
+    } else {
+
+      const [pending] = await db.query('SELECT * FROM PendingRegistrations WHERE email = ?', [email]);
+      if (pending.length === 0) {
+        return res.status(404).json({ message: 'No pending registration found for resend.' });
+      }
+
+      const otp = generateOtp();
+      const expiresAt = getExpiry();
+
+      await db.query(
+        `UPDATE PendingRegistrations SET otp = ?, otp_expires_at = ? WHERE email = ?`,
+        [otp, expiresAt, email]
+      );
+
+      await sendEmail(email, otp);
     }
 
-    // Check if already pending verification
-    const [pending] = await db.query('SELECT email FROM PendingRegistrations WHERE email = ?', [email]);
-    if (pending.length > 0) {
-      return res.status(409).json({ message: 'OTP already sent. Please verify your email.' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
-
-    await db.query(
-      `INSERT INTO PendingRegistrations (full_name, email, phone, password, role, otp, otp_expires_at, google_user)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [fullName, email, phone, password || null, role, otp, expiresAt, googleUser || false]
-    );
-
-    await sendEmail(email, otp);
     res.status(201).json({ message: 'OTP sent. Please verify your email.' });
   } catch (err) {
     console.error('Error sending OTP:', err);
@@ -48,7 +62,6 @@ export const sendOtp = async (req, res) => {
   }
 };
 
-// ✅ Verify OTP - Stage 2
 export const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
@@ -57,10 +70,11 @@ export const verifyOtp = async (req, res) => {
   }
 
   try {
-    // Validate OTP
+    const currentTime = new Date().toISOString();
+
     const [rows] = await db.query(
-      'SELECT * FROM PendingRegistrations WHERE email = ? AND otp = ? AND otp_expires_at > NOW()',
-      [email, otp]
+      'SELECT * FROM PendingRegistrations WHERE email = ? AND otp = ? AND otp_expires_at > ?',
+      [email, otp, currentTime]
     );
 
     if (rows.length === 0) {
@@ -71,6 +85,7 @@ export const verifyOtp = async (req, res) => {
     const createdAt = new Date();
 
     let passwordHash = null;
+
     if (!pending.google_user && pending.password) {
       passwordHash = await bcrypt.hash(pending.password, 10);
     }
@@ -78,13 +93,13 @@ export const verifyOtp = async (req, res) => {
     let userRecord;
 
     if (!pending.google_user) {
-      // Normal form signup: create Firebase user
+      // ✅ Normal signup: create Firebase user
       userRecord = await admin.auth().createUser({
         email: pending.email,
         password: pending.password,
       });
     } else {
-      // Google user already exists in Firebase
+      // ✅ Google user: fetch existing Firebase record
       userRecord = await admin.auth().getUserByEmail(pending.email);
     }
 
@@ -93,7 +108,17 @@ export const verifyOtp = async (req, res) => {
     await db.query(
       `INSERT INTO Users (firebase_uid, full_name, email, phone, password_hash, role, created_at, account_status, active_status, is_verified)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, true)`,
-      [firebaseUid, pending.full_name, pending.email, pending.phone, passwordHash, pending.role, createdAt, 'active', 'active']
+      [
+        firebaseUid,
+        pending.full_name,
+        pending.email,
+        pending.phone,
+        passwordHash,
+        pending.role,
+        createdAt,
+        'active',
+        'active'
+      ]
     );
 
     await db.query('DELETE FROM PendingRegistrations WHERE email = ?', [email]);
@@ -104,3 +129,7 @@ export const verifyOtp = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// ✅ Utility helpers
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+const getExpiry = () => new Date(Date.now() + 10 * 60 * 1000).toISOString();
