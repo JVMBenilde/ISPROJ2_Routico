@@ -12,6 +12,7 @@ import ForgotPasswordPage from './pages/forgotpassword';
 import DriverDashboard from './pages/driverdashboard';
 import BusinessOwnerDashboard from './pages/businessdashboard';
 import ManageDriversPage from './pages/managedrivers';
+import AdminDashboard from './pages/admindashboard';
 import { useEffect, useState } from 'react';
 import RegisterBusinessPage from './pages/businessregistration';
 
@@ -65,6 +66,7 @@ function App() {
             <Route path="/businessdashboard" element={<BusinessOwnerDashboard />} />
             <Route path="/manage-drivers" element={<ManageDriversPage />} />
             <Route path="/business-registration" element={<RegisterBusinessPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </main>
       </div>
