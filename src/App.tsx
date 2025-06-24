@@ -1,4 +1,3 @@
-// src/App.tsx
 import './App.css';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -9,27 +8,34 @@ import Footer from './components/Footer';
 import ContactUs from './pages/contact-us';
 import VerifyOtpPage from './pages/verifyotp';
 import ForgotPasswordPage from './pages/forgotpassword';
-import DriverDashboard from './pages/driverdashboard';
-import BusinessOwnerDashboard from './pages/businessdashboard';
-import ManageDriversPage from './pages/managedrivers';
+import DriverDashboard from './pages/driver/driverdashboard';
+import BusinessOwnerDashboard from './pages/business-owner/businessdashboard';
+import ManageDriversPage from './pages/business-owner/managedrivers';
 import { useEffect, useState } from 'react';
-import RegisterBusinessPage from './pages/businessregistration';
+import RegisterBusinessPage from './pages/business-owner/businessregistration';
+import Dashboard from './pages/admin/dashboard';
+import AdminAccountsPage from './pages/admin/adminaccounts';
+import ViewRegistrationsPage from './pages/admin/viewregistrations';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/termsandconditions';
+import AboutUs from './pages/AboutUs';
+import Partner from './pages/Partner';
 
 function App() {
   const location = useLocation();
-  const [storedRole, setStoredRole] = useState<'business_owner' | 'driver' | null>(null);
+  const [storedRole, setStoredRole] = useState<'business_owner' | 'driver' | 'admin' | 'super_admin' | null>(null);
 
   useEffect(() => {
     const rawRole = localStorage.getItem('role');
-    if (rawRole === 'business_owner' || rawRole === 'driver') {
+    if (rawRole === 'business_owner' || rawRole === 'driver'|| rawRole === 'admin'|| rawRole === 'super_admin') {
       setStoredRole(rawRole);
     } else {
       setStoredRole(null);
     }
   }, [location.pathname]);
 
-  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration'];
-  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration'];
+  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/admin-accounts', '/view-registrations'];
+  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/admin-accounts', '/view-registrations'];
 
   const showNavbar = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
   const showSidebar = showSidebarRoutes.some(route => location.pathname.startsWith(route)) && storedRole !== null;
@@ -39,34 +45,44 @@ function App() {
     <div className="min-h-screen flex flex-col bg-white">
       {showNavbar && <Navbar />}
 
-      <div className="flex flex-1 pt-20">
+      <div className={`flex flex-1 ${location.pathname === '/' ? 'p-0 m-0' : 'pt-20'}`}>
         {showSidebar && storedRole && <Sidebar role={storedRole} />}
 
-        <main className={`flex-1 px-4 py-6 transition-all duration-300 ${showSidebar ? 'ml-0 md:ml-64' : ''}`}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="flex items-center justify-center">
-                  <img
-                    src="/images/Delivery.png"
-                    alt="Banner"
-                    className="w-full h-auto object-contain max-w-5xl"
-                  />
-                </div>
-              }
+        {location.pathname === '/' ? (
+          <div className="w-full h-screen">
+            <img
+              src="/images/Delivery.png"
+              alt="Banner"
+              className="w-full h-full object-cover"
             />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/verify-otp" element={<VerifyOtpPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/contact-us" element={<ContactUs />} />
-            <Route path="/driverdashboard" element={<DriverDashboard />} />
-            <Route path="/businessdashboard" element={<BusinessOwnerDashboard />} />
-            <Route path="/manage-drivers" element={<ManageDriversPage />} />
-            <Route path="/business-registration" element={<RegisterBusinessPage />} />
-          </Routes>
-        </main>
+          </div>
+        ) : (
+          <main
+            className={`flex-1 px-4 py-6 transition-all duration-300 ${
+              showSidebar ? 'ml-0 md:ml-64' : ''
+            }`}
+          >
+            <Routes>
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/verify-otp" element={<VerifyOtpPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/driverdashboard" element={<DriverDashboard />} />
+              <Route path="/businessdashboard" element={<BusinessOwnerDashboard />} />
+              <Route path="/manage-drivers" element={<ManageDriversPage />} />
+              <Route path="/business-registration" element={<RegisterBusinessPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin-accounts" element={<AdminAccountsPage />} />
+              <Route path="/view-registrations" element={<ViewRegistrationsPage />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />More actions
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/partner" element={<Partner />} />
+            </Routes>
+          </main>
+        )}
       </div>
 
       {showFooter && <Footer />}

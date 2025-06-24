@@ -46,6 +46,10 @@ const LoginPage = () => {
           navigate('/businessdashboard');
         } else if (data.role === 'driver') {
           navigate('/driverdashboard');
+        } else if (data.role === 'super_admin') {
+          navigate('/dashboard');
+        } else if (data.role === 'admin') {
+          navigate('/dashboard');
         } else {
           navigate('/');
         }
@@ -84,6 +88,10 @@ const LoginPage = () => {
           navigate('/businessdashboard');
         } else if (data.role === 'driver') {
           navigate('/driverdashboard');
+        } else if (data.role === 'super_admin') {
+          navigate('/dashboard');
+        } else if (data.role === 'admin') {
+          navigate('/admindashboard');
         } else {
           navigate('/');
         }
@@ -96,7 +104,7 @@ const LoginPage = () => {
   };
 
   return (
-    <main className="min-h-screen flex items-start justify-center bg-white px-4 pt-30 pb-10">
+    <main className="min-h-screen flex items-start justify-center bg-white px-4 pt-10 pb-10">
       <div className="bg-white p-10 md:p-20 rounded-2xl shadow-lg w-full max-w-md text-left border border-gray-300">
         <h1 className="text-4xl font-extrabold text-center text-black">Routico</h1>
         <h2 className="text-xl font-semibold text-center mt-2 mb-6">Login</h2>

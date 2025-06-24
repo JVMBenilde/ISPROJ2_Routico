@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 #root {
   width: 100%;
   margin: 0 auto;
@@ -13,13 +19,14 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #ecedf0aa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #f1f3f4aa);
 }
-
 
 .card {
   padding: 2em;
