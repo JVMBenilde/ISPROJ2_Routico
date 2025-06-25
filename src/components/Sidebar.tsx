@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 
-const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
+const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'super_admin' }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,10 +57,10 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
       <aside className={`bg-gray-200 text-black fixed top-0 left-0 h-screen border-r border-gray-300 p-4 transition-transform duration-300 transform ${menuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:w-64 w-64 z-40 flex flex-col justify-between`}>
         <div>
           <h2 className="text-xl font-bold mb-6">
-            {role === 'business_owner' ? 'Business Owner' : 'Driver'} Panel
+            {role === 'business_owner' ? 'Business Owner' : role === 'driver' ? 'Driver' : role === 'admin' ? 'Admin' : 'Super Admin'} Panel
           </h2>
           <nav className="space-y-2">
-            {role === 'business_owner' ? (
+            {role === 'business_owner' && (
               <>
                 <Link to="/businessdashboard" className={linkStyle('/businessdashboard')}>Dashboard</Link>
                 <Link to="/business-registration" className={linkStyle('/business-registration')}>Business Registration</Link>
@@ -71,11 +71,28 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' }) => {
                 <Link to="/business-overview" className={linkStyle('/business-overview')}>Business Overview</Link>
                 <Link to="/fleet-management" className={linkStyle('/fleet-management')}>Fleet Management</Link>
               </>
-            ) : (
+            )}
+            {role === 'driver' && (
               <>
                 <Link to="/driverdashboard" className={linkStyle('/driverdashboard')}>Driver Dashboard</Link>
                 <Link to="/assigned-orders" className={linkStyle('/assigned-orders')}>Assigned Orders</Link>
                 <Link to="/delivery-status" className={linkStyle('/delivery-status')}>Delivery Status</Link>
+              </>
+            )}
+            {role === 'admin' && (
+              <>
+                <Link to="/dashboard" className={linkStyle('/dashboard')}>Dashboard</Link>
+                <Link to="/admindashboard" className={linkStyle('/admindashboard')}>Dashboard</Link>
+                <Link to="/activity-logs" className={linkStyle('/activity-logs')}>Activity Logs</Link>
+                
+              </>
+            )}
+            {role === 'super_admin' && (
+              <>
+                <Link to="/dashboard" className={linkStyle('/dashboard')}>Dashboard</Link>
+                <Link to="/view-registrations" className={linkStyle('/view-registrations')}>Business Registrations</Link>
+                <Link to="/all-users" className={linkStyle('/all-users')}>All Users</Link>
+                <Link to="/admin-accounts" className={linkStyle('/admin-accounts')}>Co-Admins</Link>
               </>
             )}
           </nav>
