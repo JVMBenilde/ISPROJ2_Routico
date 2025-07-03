@@ -10,7 +10,9 @@ import checkEmailRoute from './routes/checkEmailRoute.js';
 import businessRoute from './routes/businessRoute.js';
 import userRoute from './routes/userRoute.js';
 import viewRegistrationsRoute from './routes/viewRegistrationsRoute.js';
-import adminRoute from './routes/adminRoute.js';
+import vehicleRoute from './routes/vehicleRoute.js';
+import accountRoute from './routes/accountRoute.js';
+import issueRoute from './routes/issueRoute.js';
 
 
 const app = express();
@@ -35,7 +37,9 @@ app.use('/api/check-email', checkEmailRoute);
 app.use('/api/business-owners', businessRoute);
 app.use('/api/users', userRoute);
 app.use('/api/view-registrations', viewRegistrationsRoute);
-app.use('/api/users', adminRoute);
+app.use('/api/vehicles', vehicleRoute);
+app.use('/api/accounts', accountRoute);
+app.use('/api/issues', issueRoute);
 
 app.listen(PORT, () => {
   console.log(`✅ Backend API server running at http://localhost:${PORT}`);

@@ -70,6 +70,7 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'supe
                 <Link to="/route-optimization" className={linkStyle('/route-optimization')}>Route Optimization</Link>
                 <Link to="/business-overview" className={linkStyle('/business-overview')}>Business Overview</Link>
                 <Link to="/fleet-management" className={linkStyle('/fleet-management')}>Fleet Management</Link>
+                <Link to="/issue-report" className={linkStyle('/issue-report')}>Issue Report</Link>
               </>
             )}
             {role === 'driver' && (
@@ -91,8 +92,8 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'supe
               <>
                 <Link to="/dashboard" className={linkStyle('/dashboard')}>Dashboard</Link>
                 <Link to="/view-registrations" className={linkStyle('/view-registrations')}>Business Registrations</Link>
-                <Link to="/all-users" className={linkStyle('/all-users')}>All Users</Link>
-                <Link to="/admin-accounts" className={linkStyle('/admin-accounts')}>Co-Admins</Link>
+                <Link to="/issue-resolution" className={linkStyle('/issue-resolution')}>Issue Resolution</Link>
+                <Link to="/accounts" className={linkStyle('/accounts')}>Account Management</Link>
               </>
             )}
           </nav>

@@ -14,12 +14,15 @@ import ManageDriversPage from './pages/business-owner/managedrivers';
 import { useEffect, useState } from 'react';
 import RegisterBusinessPage from './pages/business-owner/businessregistration';
 import Dashboard from './pages/admin/dashboard';
-import AdminAccountsPage from './pages/admin/adminaccounts';
 import ViewRegistrationsPage from './pages/admin/viewregistrations';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/termsandconditions';
 import AboutUs from './pages/AboutUs';
 import Partner from './pages/Partner';
+import ManageVehiclesPage from './pages/business-owner/fleetmanagement';
+import AccountManagementPage from './pages/admin/accountmanagement';
+import BusinessIssueReportPage from './pages/business-owner/issuereport';
+import IssueResolutionPage from './pages/admin/issueresolution';
 
 function App() {
   const location = useLocation();
@@ -34,8 +37,8 @@ function App() {
     }
   }, [location.pathname]);
 
-  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/admin-accounts', '/view-registrations'];
-  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/admin-accounts', '/view-registrations'];
+  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report'];
+  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report'];
 
   const showNavbar = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
   const showSidebar = showSidebarRoutes.some(route => location.pathname.startsWith(route)) && storedRole !== null;
@@ -73,13 +76,16 @@ function App() {
               <Route path="/manage-drivers" element={<ManageDriversPage />} />
               <Route path="/business-registration" element={<RegisterBusinessPage />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin-accounts" element={<AdminAccountsPage />} />
               <Route path="/view-registrations" element={<ViewRegistrationsPage />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />More actions
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/partner" element={<Partner />} />
+              <Route path="/fleet-management" element={<ManageVehiclesPage />} />
+              <Route path="/accounts" element={<AccountManagementPage />} />
+              <Route path="/issue-report" element={<BusinessIssueReportPage />} />
+              <Route path="/issue-resolution" element={<IssueResolutionPage />} />
             </Routes>
           </main>
         )}
