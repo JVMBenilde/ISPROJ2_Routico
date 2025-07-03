@@ -23,6 +23,7 @@ import ManageVehiclesPage from './pages/business-owner/fleetmanagement';
 import AccountManagementPage from './pages/admin/accountmanagement';
 import BusinessIssueReportPage from './pages/business-owner/issuereport';
 import IssueResolutionPage from './pages/admin/issueresolution';
+import CreateOrderPage from './pages/business-owner/createorder';
 
 function App() {
   const location = useLocation();
@@ -37,8 +38,8 @@ function App() {
     }
   }, [location.pathname]);
 
-  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report'];
-  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report'];
+  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order'];
+  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order'];
 
   const showNavbar = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
   const showSidebar = showSidebarRoutes.some(route => location.pathname.startsWith(route)) && storedRole !== null;
@@ -86,6 +87,7 @@ function App() {
               <Route path="/accounts" element={<AccountManagementPage />} />
               <Route path="/issue-report" element={<BusinessIssueReportPage />} />
               <Route path="/issue-resolution" element={<IssueResolutionPage />} />
+              <Route path="/create-order" element={<CreateOrderPage />} />
             </Routes>
           </main>
         )}

@@ -138,7 +138,7 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <input name="fullName" type="text" placeholder="Juan Dela Cruz" value={form.fullName} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} required />
           <input name="email" type="email" placeholder="juandelacruz@email.com" value={form.email} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} required />
-          <input name="phone" type="text" placeholder="09XXXXXXXXX" value={form.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} required />
+          <input name="phone" type="tel" placeholder="09XXXXXXXXX" value={form.phone} onChange={handleChange} pattern="^(\+63|0)?9\d{9}$" className="w-full px-4 py-2 border rounded-md" disabled={loading} required />
 
           <select name="role" value={form.role} onChange={handleChange} className="w-full px-4 py-2 border rounded-md" disabled={loading} required>
             <option value="">Select Role</option>

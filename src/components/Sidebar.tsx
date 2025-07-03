@@ -6,6 +6,7 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'supe
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
 
   const linkStyle = (path: string) =>
     `block px-4 py-2 rounded-md text-sm font-medium ${
@@ -64,7 +65,18 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'supe
               <>
                 <Link to="/businessdashboard" className={linkStyle('/businessdashboard')}>Dashboard</Link>
                 <Link to="/business-registration" className={linkStyle('/business-registration')}>Business Registration</Link>
-                <Link to="/order-history" className={linkStyle('/order-history')}>Order History</Link>
+                <button
+                  className="w-full text-center px-4 py-2  text-sm font-medium text-black hover:text-gray-600"
+                  onClick={() => setOrderOpen((prev) => !prev)}
+                >
+                  Order
+                </button>
+                {orderOpen && (
+                  <div className="ml-4 space-y-1">
+                    <Link to="/create-order" className={linkStyle('/create-order')}>Create Order</Link>
+                    <Link to="/order-history" className={linkStyle('/order-history')}>Order History</Link>
+                  </div>
+                )}
                 <Link to="/manage-drivers" className={linkStyle('/manage-drivers')}>Manage Drivers</Link>
                 <Link to="/truck-utilization" className={linkStyle('/truck-utilization')}>Truck Utilization</Link>
                 <Link to="/route-optimization" className={linkStyle('/route-optimization')}>Route Optimization</Link>
@@ -85,7 +97,6 @@ const Sidebar = ({ role }: { role: 'business_owner' | 'driver' | 'admin' | 'supe
                 <Link to="/dashboard" className={linkStyle('/dashboard')}>Dashboard</Link>
                 <Link to="/admindashboard" className={linkStyle('/admindashboard')}>Dashboard</Link>
                 <Link to="/activity-logs" className={linkStyle('/activity-logs')}>Activity Logs</Link>
-                
               </>
             )}
             {role === 'super_admin' && (

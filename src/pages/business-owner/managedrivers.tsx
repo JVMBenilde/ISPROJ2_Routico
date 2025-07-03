@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { auth } from '../../firebase'; 
+import { auth } from '../../firebase';
+import { Search, Filter, Upload } from 'lucide-react';
 
 interface Driver {
   driver_id: number;
@@ -14,6 +15,9 @@ const ManageDriversPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ fullName: '', phone: '', licenseNumber: '' });
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editingDriverId, setEditingDriverId] = useState<number | null>(null);
 
   const getToken = async () => {
     const user = auth.currentUser;
@@ -25,13 +29,11 @@ const ManageDriversPage = () => {
     try {
       const token = await getToken();
       const res = await fetch('/api/drivers', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setDrivers(data);
-    } catch (err) {
+    } catch {
       Swal.fire('Failed to load drivers.', '', 'error');
     }
   };
@@ -47,9 +49,9 @@ const ManageDriversPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!form.fullName || !form.phone || !form.licenseNumber) {
-      Swal.fire('All fields are required!', '', 'warning');
+    const { fullName, phone, licenseNumber } = form;
+    if (!fullName || !phone || !licenseNumber) {
+      Swal.fire('All fields are required.', '', 'warning');
       return;
     }
 
@@ -57,32 +59,33 @@ const ManageDriversPage = () => {
 
     try {
       const token = await getToken();
-      const res = await fetch('/api/drivers', {
-        method: 'POST',
+      const url = editMode ? `/api/drivers/${editingDriverId}` : '/api/drivers';
+      const method = editMode ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          phone: form.phone,
-          licenseNumber: form.licenseNumber,
-        }),
+        body: JSON.stringify({ fullName, phone, licenseNumber }),
       });
 
       if (res.ok) {
-        Swal.fire('Driver added!', '', 'success');
+        Swal.fire(`Driver ${editMode ? 'updated' : 'added'}!`, '', 'success');
         setShowForm(false);
+        setForm({ fullName: '', phone: '', licenseNumber: '' });
+        setEditMode(false);
+        setEditingDriverId(null);
         fetchDrivers();
       } else {
-        const errorData = await res.json();
-        Swal.fire(errorData.message || 'Failed to add driver.', '', 'error');
+        const error = await res.json();
+        Swal.fire(error.message || 'Failed to save driver.', '', 'error');
       }
     } catch {
       Swal.fire('Server error.', '', 'error');
     } finally {
       setLoading(false);
-      setForm({ fullName: '', phone: '', licenseNumber: '' });
     }
   };
 
@@ -99,9 +102,7 @@ const ManageDriversPage = () => {
           const token = await getToken();
           const res = await fetch(`/api/drivers/${driverId}`, {
             method: 'DELETE',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {
             Swal.fire('Deleted!', '', 'success');
@@ -116,25 +117,104 @@ const ManageDriversPage = () => {
     });
   };
 
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-start p-4">
-      <h1 className="text-3xl font-bold mb-6">Manage Drivers</h1>
+  const handleEdit = (driver: Driver) => {
+    setForm({
+      fullName: driver.full_name,
+      phone: driver.phone,
+      licenseNumber: driver.license_number,
+    });
+    setEditMode(true);
+    setEditingDriverId(driver.driver_id);
+    setShowForm(true);
+  };
 
-      <button
-        className="mb-4 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-        onClick={() => {
-          setShowForm(true);
-          setForm({ fullName: '', phone: '', licenseNumber: '' });
-        }}
-      >
-        Add Driver
-      </button>
+  const filteredDrivers = drivers.filter((d) =>
+    d.full_name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <main className="min-h-screen p-6 flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Driver Management</h1>
+          <p className="text-sm text-gray-600">Manage your driver assignments</p>
+        </div>
+        <button
+          className="bg-black text-white px-4 py-2 rounded shadow"
+          onClick={() => {
+            setShowForm(true);
+            setEditMode(false);
+            setForm({ fullName: '', phone: '', licenseNumber: '' });
+          }}
+        >
+          + Add Driver
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <Search className="absolute top-2 left-2 w-4 h-4 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search driver"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 pr-2 py-1 border rounded"
+          />
+        </div>
+        <Filter className="w-5 h-5 text-gray-700" />
+        <Upload className="w-5 h-5 text-gray-700" />
+      </div>
+
+      <div className="overflow-x-auto bg-white border rounded shadow">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-center font-medium">Full Name</th>
+              <th className="p-3 text-center font-medium">Phone</th>
+              <th className="p-3 text-center font-medium">License Number</th>
+              <th className="p-3 text-center font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredDrivers.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center py-4 text-gray-500">No drivers found.</td>
+              </tr>
+            ) : (
+              filteredDrivers.map((driver) => (
+                <tr key={driver.driver_id} className="hover:bg-gray-50">
+                  <td className="p-3">{driver.full_name}</td>
+                  <td className="p-3">{driver.phone}</td>
+                  <td className="p-3">{driver.license_number}</td>
+                  <td className="p-3 text-center">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                        onClick={() => handleEdit(driver)}
+                        >
+                         Edit
+                      </button>
+                      <button
+                        className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                        onClick={() => handleDelete(driver.driver_id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {showForm && (
-        <div className="w-full max-w-md mb-6">
-          <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 border rounded shadow">
+        <div className="w-full max-w-md mt-6 mx-auto">
+          <form onSubmit={handleSubmit} className="bg-white p-4 border rounded shadow space-y-4">
             <div>
-              <label className="block font-medium">Full Name</label>
+              <label className="block font-medium mb-1">Full Name</label>
               <input
                 type="text"
                 name="fullName"
@@ -144,7 +224,7 @@ const ManageDriversPage = () => {
               />
             </div>
             <div>
-              <label className="block font-medium">Phone</label>
+              <label className="block font-medium mb-1">Phone</label>
               <input
                 type="text"
                 name="phone"
@@ -154,7 +234,7 @@ const ManageDriversPage = () => {
               />
             </div>
             <div>
-              <label className="block font-medium">License Number</label>
+              <label className="block font-medium mb-1">License Number</label>
               <input
                 type="text"
                 name="licenseNumber"
@@ -168,47 +248,11 @@ const ManageDriversPage = () => {
               className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
               disabled={loading}
             >
-              Add Driver
+              {editMode ? 'Update Driver' : 'Add Driver'}
             </button>
           </form>
         </div>
       )}
-
-      <table className="w-full max-w-4xl border-collapse border">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2 border">Full Name</th>
-            <th className="p-2 border">Phone</th>
-            <th className="p-2 border">License Number</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {drivers.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="text-center p-4">
-                No drivers added yet.
-              </td>
-            </tr>
-          ) : (
-            drivers.map((driver) => (
-              <tr key={driver.driver_id}>
-                <td className="p-2 border">{driver.full_name}</td>
-                <td className="p-2 border">{driver.phone}</td>
-                <td className="p-2 border">{driver.license_number}</td>
-                <td className="p-2 border">
-                  <button
-                    className="px-2 py-1 bg-red-500 text-white rounded"
-                    onClick={() => handleDelete(driver.driver_id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
     </main>
   );
 };
