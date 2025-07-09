@@ -12,7 +12,6 @@ export const sendOtp = async (req, res) => {
 
   try {
     if (!resend) {
-
       if (!fullName || !phone || !role) {
         return res.status(400).json({ message: 'All fields are required' });
       }
@@ -38,7 +37,6 @@ export const sendOtp = async (req, res) => {
 
       await sendEmail(email, otp);
     } else {
-
       const [pending] = await db.query('SELECT * FROM PendingRegistrations WHERE email = ?', [email]);
       if (pending.length === 0) {
         return res.status(404).json({ message: 'No pending registration found for resend.' });
@@ -93,21 +91,27 @@ export const verifyOtp = async (req, res) => {
     let userRecord;
 
     if (!pending.google_user) {
-      // ✅ Normal signup: create Firebase user
       userRecord = await admin.auth().createUser({
         email: pending.email,
         password: pending.password,
       });
     } else {
-      // ✅ Google user: fetch existing Firebase record
       userRecord = await admin.auth().getUserByEmail(pending.email);
     }
 
     const firebaseUid = userRecord.uid;
 
+    // ✅ Assign role_id based on role
+    let roleId;
+    if (pending.role === 'driver' || pending.role === 'business_owner') {
+      roleId = 2;
+    } else {
+      return res.status(400).json({ message: 'Invalid role during verification' });
+    }
+
     await db.query(
-      `INSERT INTO Users (firebase_uid, full_name, email, phone, password_hash, role, created_at, account_status, active_status, is_verified)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, true)`,
+      `INSERT INTO Users (firebase_uid, full_name, email, phone, password_hash, role, role_id, created_at, account_status, active_status, is_verified)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true)`,
       [
         firebaseUid,
         pending.full_name,
@@ -115,6 +119,7 @@ export const verifyOtp = async (req, res) => {
         pending.phone,
         passwordHash,
         pending.role,
+        roleId,
         createdAt,
         'active',
         'active'
