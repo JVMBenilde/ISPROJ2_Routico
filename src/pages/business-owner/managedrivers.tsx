@@ -32,8 +32,16 @@ const ManageDriversPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+
+      if (!res.ok || !Array.isArray(data)) {
+        console.warn('[Driver Fetch Error]', data);
+        setDrivers([]);
+        return;
+      }
+
       setDrivers(data);
-    } catch {
+    } catch (err) {
+      console.error('Fetch Drivers Error:', err);
       Swal.fire('Failed to load drivers.', '', 'error');
     }
   };
@@ -128,9 +136,9 @@ const ManageDriversPage = () => {
     setShowForm(true);
   };
 
-  const filteredDrivers = drivers.filter((d) =>
-    d.full_name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredDrivers = Array.isArray(drivers)
+    ? drivers.filter((d) => d.full_name.toLowerCase().includes(search.toLowerCase()))
+    : [];
 
   return (
     <main className="min-h-screen p-6 flex flex-col gap-4">
@@ -192,8 +200,8 @@ const ManageDriversPage = () => {
                       <button
                         className="px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
                         onClick={() => handleEdit(driver)}
-                        >
-                         Edit
+                      >
+                        Edit
                       </button>
                       <button
                         className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"

@@ -26,18 +26,28 @@ const uploadFileToS3 = async (buffer, fileName, mimeType) => {
 };
 
 export const submitBusiness = async (req, res) => {
+  console.log('[SUBMIT] submitBusiness called');
+  console.log('[SUBMIT] Request body:', req.body);
+  console.log('[SUBMIT] Request files:', req.files);
+  console.log('[SUBMIT] User:', req.user);
+  
   const { companyName, businessType } = req.body;
   const govIdFile = req.files.find(file => file.fieldname === 'govId');
   const permitFile = req.files.find(file => file.fieldname === 'permit');
 
+  console.log('[SUBMIT] Extracted data:', { companyName, businessType, govIdFile: !!govIdFile, permitFile: !!permitFile });
+
   if (!companyName || !businessType || !govIdFile || !permitFile) {
+    console.log('[SUBMIT] Missing required fields');
     return res.status(400).json({ error: 'All fields and documents are required.' });
   }
 
   try {
     const userId = req.user.userId;
+    console.log('[SUBMIT] Starting file upload to S3...');
     const govIdUrl = await uploadFileToS3(govIdFile.buffer, govIdFile.originalname, govIdFile.mimetype);
     const permitUrl = await uploadFileToS3(permitFile.buffer, permitFile.originalname, permitFile.mimetype);
+    console.log('[SUBMIT] Files uploaded successfully');
 
     const sql = `
       INSERT INTO PendingBusinessRegistrations (
@@ -46,7 +56,9 @@ export const submitBusiness = async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())`;
     const values = [userId, companyName, businessType, govIdUrl, permitUrl];
 
+    console.log('[SUBMIT] Inserting into database...');
     await db.query(sql, values);
+    console.log('[SUBMIT] Database insertion successful');
     return res.status(200).json({ message: 'Submitted for review.' });
   } catch (error) {
     console.error('❌ submitBusiness error:', error);

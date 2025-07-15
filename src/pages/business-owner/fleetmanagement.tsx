@@ -199,7 +199,7 @@ const ManageVehiclesPage = () => {
                   <td className="p-3 text-center">TRK-{truck.truck_id.toString().padStart(3, '0')}</td>
                   <td className="p-3 text-center">{truck.plate_number}</td>
                   <td className="p-3 text-center">{truck.model}</td>
-                  <td className="p-3 text-center">{truck.capacity.toLocaleString()} lbs</td>
+                  <td className="p-3 text-center">{truck.capacity.toLocaleString()} Kg</td>
                   <td className="p-3 text-center capitalize">{truck.status}</td>
                   <td className="p-3 text-center">
                     <div className="flex justify-center gap-2">
@@ -248,7 +248,7 @@ const ManageVehiclesPage = () => {
               />
             </div>
             <div>
-              <label className="block font-medium mb-1">Capacity (lbs)</label>
+              <label className="block font-medium mb-1">Capacity (Kg)</label>
               <input
                 type="number"
                 name="capacity"

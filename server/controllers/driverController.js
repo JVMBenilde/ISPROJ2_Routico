@@ -3,6 +3,7 @@ import { db } from '../db.js';
 // Fetch drivers for the authenticated business owner
 export const getDrivers = async (req, res) => {
   const userId = req.user.userId;
+
   try {
     const [[owner]] = await db.query(
       'SELECT owner_id FROM BusinessOwners WHERE user_id = ?',
@@ -25,12 +26,17 @@ export const getDrivers = async (req, res) => {
   }
 };
 
-// Add driver with validation against Users table
+// Add driver with validation against Users table and duplicate prevention
 export const addDriver = async (req, res) => {
   const { fullName, phone, licenseNumber } = req.body;
   const userId = req.user.userId;
 
   try {
+    const licenseRegex = /^[A-Z0-9]{3}-\d{2}-\d{6}$/;
+    if (!licenseRegex.test(licenseNumber)) {
+      return res.status(400).json({ message: 'Invalid license number format. Expected format: XXX-XX-XXXXXX (letters/numbers allowed in first segment)' });
+    }
+
     const [[owner]] = await db.query(
       'SELECT owner_id FROM BusinessOwners WHERE user_id = ?',
       [userId]
@@ -40,13 +46,25 @@ export const addDriver = async (req, res) => {
       return res.status(403).json({ message: 'You must have a registered business to add drivers.' });
     }
 
-    const [results] = await db.query(
+    const [matchingUsers] = await db.query(
       `SELECT user_id FROM Users WHERE full_name = ? AND phone = ? AND role = 'driver'`,
       [fullName, phone]
     );
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Name and Phone number doesn\'t match any Drivers. Please check if details are correct.' });
+    if (matchingUsers.length === 0) {
+      return res.status(404).json({
+        message: 'Name and Phone number doesn\'t match any Drivers. Please check if details are correct.'
+      });
+    }
+
+    const [existingDrivers] = await db.query(
+      `SELECT driver_id FROM Drivers 
+       WHERE full_name = ? AND phone = ? AND license_number = ? AND owner_id = ?`,
+      [fullName, phone, licenseNumber, owner.owner_id]
+    );
+
+    if (existingDrivers.length > 0) {
+      return res.status(409).json({ message: 'This driver is already added to your business.' });
     }
 
     await db.query(
