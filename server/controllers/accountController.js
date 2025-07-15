@@ -1,7 +1,7 @@
-// server/controllers/accountController.js
+
 import { db } from '../db.js';
 import bcrypt from 'bcrypt';
-import admin from '../firebaseAdmin.js'; // ✅ Firebase Admin SDK
+import admin from '../firebaseAdmin.js'; 
 
 export const getAllAccounts = async (req, res) => {
   try {

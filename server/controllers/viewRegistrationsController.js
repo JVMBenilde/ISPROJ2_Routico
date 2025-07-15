@@ -3,14 +3,16 @@ import { db } from '../db.js';
 export const getAllBusinessRegistrations = async (req, res) => {
   try {
     const [pendingAndRejected] = await db.query(`
-      SELECT id, user_id, company_name, business_type, status
-      FROM PendingBusinessRegistrations
-      WHERE status IN ('pending', 'rejected')
+      SELECT p.id, p.user_id, u.full_name AS owner_name, p.company_name, p.business_type, p.status
+      FROM PendingBusinessRegistrations p
+      JOIN Users u ON p.user_id = u.user_id
+      WHERE p.status IN ('pending', 'rejected')
     `);
 
     const [approved] = await db.query(`
-      SELECT NULL AS id, user_id, company_name, business_type, 'approved' AS status
-      FROM BusinessOwners
+      SELECT NULL AS id, b.user_id, u.full_name AS owner_name, b.company_name, b.business_type, 'approved' AS status
+      FROM BusinessOwners b
+      JOIN Users u ON b.user_id = u.user_id
     `);
 
     const combined = [...pendingAndRejected, ...approved];

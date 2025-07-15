@@ -24,6 +24,8 @@ import AccountManagementPage from './pages/admin/accountmanagement';
 import BusinessIssueReportPage from './pages/business-owner/issuereport';
 import IssueResolutionPage from './pages/admin/issueresolution';
 import CreateOrderPage from './pages/business-owner/createorder';
+import OrderHistoryPage from './pages/business-owner/orderhistory';
+import AssignedOrdersPage from './pages/driver/assignedorders';
 
 function App() {
   const location = useLocation();
@@ -38,8 +40,8 @@ function App() {
     }
   }, [location.pathname]);
 
-  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order'];
-  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order'];
+  const hideNavbarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order', '/order-history', '/assigned-orders'];
+  const showSidebarRoutes = ['/driverdashboard', '/businessdashboard', '/manage-drivers', '/business-registration', '/dashboard', '/view-registrations', '/fleet-management', '/accounts', '/issue-resolution', '/issue-report', '/create-order', '/order-history', '/assigned-orders'];
 
   const showNavbar = !hideNavbarRoutes.some(route => location.pathname.startsWith(route));
   const showSidebar = showSidebarRoutes.some(route => location.pathname.startsWith(route)) && storedRole !== null;
@@ -88,6 +90,8 @@ function App() {
               <Route path="/issue-report" element={<BusinessIssueReportPage />} />
               <Route path="/issue-resolution" element={<IssueResolutionPage />} />
               <Route path="/create-order" element={<CreateOrderPage />} />
+              <Route path="/order-history" element={<OrderHistoryPage />} />
+              <Route path="/assigned-orders" element={<AssignedOrdersPage />} />
             </Routes>
           </main>
         )}

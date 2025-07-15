@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create pool
+// Create MySQL connection pool
 export const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -13,10 +13,10 @@ export const db = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  keepAliveInitialDelay: 0,
 });
 
-// OPTIONAL: Ping MySQL to keep connection alive
+// OPTIONAL: Keep-alive ping
 const keepConnectionAlive = () => {
   setInterval(async () => {
     try {
@@ -25,8 +25,9 @@ const keepConnectionAlive = () => {
     } catch (err) {
       console.error('❌ MySQL keep-alive ping failed:', err);
     }
-  }, 300000);
+  }, 300000); // every 5 minutes
 };
 
-
 keepConnectionAlive();
+
+export default db;

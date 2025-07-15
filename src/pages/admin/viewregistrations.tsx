@@ -12,6 +12,7 @@ interface BusinessRegistration {
   company_name: string;
   business_type: string;
   status: 'pending' | 'approved' | 'rejected';
+  owner_name: string;
 }
 
 const ViewRegistrationsPage = () => {
@@ -30,6 +31,7 @@ const ViewRegistrationsPage = () => {
     try {
       const token = await getToken();
       const data = await fetchAllBusinessRegistrations(token);
+      console.log('Registrations data:', data);
       setRegistrations(data);
     } catch {
       Swal.fire('Failed to load registrations.', '', 'error');
@@ -87,62 +89,64 @@ const ViewRegistrationsPage = () => {
     <main className="min-h-screen p-6 flex flex-col items-center bg-gray-50">
       <h1 className="text-3xl font-bold mb-6">View Registrations</h1>
 
-      <table className="w-full max-w-5xl border-collapse border bg-white">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2 border">User ID</th>
-            <th className="p-2 border">Company Name</th>
-            <th className="p-2 border">Business</th>
-            <th className="p-2 border">Status</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {registrations.length === 0 ? (
-            <tr><td colSpan={5} className="text-center p-4">No registrations found.</td></tr>
-          ) : (
-            registrations.map(reg => (
-              <tr key={reg.user_id}>
-                <td className="p-2 border">{reg.user_id}</td>
-                <td className="p-2 border">{reg.company_name}</td>
-                <td className="p-2 border">{reg.business_type}</td>
-                <td className="p-2 border">
-                  <span className={getStatusStyle(reg.status)}>{reg.status}</span>
-                </td>
-                <td className="p-2 border space-x-2">
-                  {reg.status === 'pending' && (
-                    <>
-                      <button
-                        className="px-2 py-1 bg-green-500 text-white rounded"
-                        onClick={() => handleApprove(reg.user_id)}
-                      >Approve</button>
-                      <button
-                        className="px-2 py-1 bg-red-500 text-white rounded"
-                        onClick={() => setShowReasonInputId(reg.user_id)}
-                      >Disapprove</button>
-                    </>
-                  )}
-                  {showReasonInputId === reg.user_id && (
-                    <div className="mt-2">
-                      <input
-                        type="text"
-                        placeholder="Reason for disapproval"
-                        className="p-2 border rounded w-full mb-2"
-                        value={disapprovalReason}
-                        onChange={e => setDisapprovalReason(e.target.value)}
-                      />
-                      <button
-                        className="px-2 py-1 bg-gray-800 text-white rounded"
-                        onClick={() => handleDisapprove(reg.user_id)}
-                      >Submit</button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <div className="overflow-x-auto bg-white rounded shadow border w-full max-w-5xl">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-center font-medium">Business Owner</th>
+              <th className="p-3 text-center font-medium">Company Name</th>
+              <th className="p-3 text-center font-medium">Business</th>
+              <th className="p-3 text-center font-medium">Status</th>
+              <th className="p-3 text-center font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {registrations.length === 0 ? (
+              <tr><td colSpan={5} className="text-center p-4">No registrations found.</td></tr>
+            ) : (
+              registrations.map(reg => (
+                <tr key={reg.user_id} className="hover:bg-gray-50 text-center">
+                  <td className="p-3">{reg.owner_name}</td>
+                  <td className="p-3">{reg.company_name}</td>
+                  <td className="p-3">{reg.business_type}</td>
+                  <td className="p-3">
+                    <span className={getStatusStyle(reg.status)}>{reg.status}</span>
+                  </td>
+                  <td className="p-3 space-x-2">
+                    {reg.status === 'pending' && (
+                      <>
+                        <button
+                          className="px-2 py-1 bg-green-500 text-white rounded text-xs"
+                          onClick={() => handleApprove(reg.user_id)}
+                        >Approve</button>
+                        <button
+                          className="px-2 py-1 bg-red-500 text-white rounded text-xs"
+                          onClick={() => setShowReasonInputId(reg.user_id)}
+                        >Disapprove</button>
+                      </>
+                    )}
+                    {showReasonInputId === reg.user_id && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          placeholder="Reason for disapproval"
+                          className="p-2 border rounded w-full mb-2"
+                          value={disapprovalReason}
+                          onChange={e => setDisapprovalReason(e.target.value)}
+                        />
+                        <button
+                          className="px-2 py-1 bg-gray-800 text-white rounded text-xs"
+                          onClick={() => handleDisapprove(reg.user_id)}
+                        >Submit</button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 };

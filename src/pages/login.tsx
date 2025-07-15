@@ -28,6 +28,9 @@ const LoginPage = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
 
+      // ✅ Store Firebase token for future API calls
+      localStorage.setItem('token', token);
+
       const res = await fetch('/api/auth-role', {
         method: 'POST',
         headers: {
@@ -69,6 +72,9 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const token = await user.getIdToken();
+
+      // ✅ Store Firebase token for future API calls
+      localStorage.setItem('token', token);
 
       const res = await fetch('/api/auth-role', {
         method: 'POST',
@@ -123,8 +129,8 @@ const LoginPage = () => {
           </button>
 
           <p className="text-sm text-center text-gray-600 mt-4">
-          <Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot password</Link>
-        </p>
+            <Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot password</Link>
+          </p>
 
           <button type="button" onClick={handleGoogleLogin} className="w-full py-3 px-4 border border-gray-500 rounded-lg flex items-center justify-center bg-white shadow-sm hover:bg-gray-50 transition-all" disabled={loading}>
             Login with Google
